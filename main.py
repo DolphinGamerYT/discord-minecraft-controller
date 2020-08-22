@@ -6,8 +6,26 @@ from discord.utils import get
 import asyncio
 from modules import keyboard, mouse
 import yaml
+import os
 
-with open('config.yml') as file:
+config = {}
+
+if (os.path.isfile("./config.yml")):
+    with open('config.yml') as file:
+        config = yaml.safe_load(file)
+else:
+    f = open("config.yml","w")
+    f.write("#####################################\n")
+    f.write("##                                 ##\n")
+    f.write("##    Minecraft Discord Edition    ##\n")
+    f.write("##          By Dolphln             ##\n")
+    f.write("##                                 ##\n")
+    f.write("#####################################\n")
+    f.write("\n")
+    f.write("bot_token: 'your-bot-token-here'\n")
+    f.write("keyword_delay: 0.3\n")
+    f.close()
+    file = open("config.yml")
     config = yaml.safe_load(file)
 
 delay = 0.3
