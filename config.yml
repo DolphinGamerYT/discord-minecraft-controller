@@ -1,0 +1,9 @@
+#####################################
+##                                 ##
+##    Minecraft Discord Edition    ##
+##          By Dolphln             ##
+##                                 ##
+#####################################
+
+bot_token: 'your-token-here'
+keyword_delay: 0.3
