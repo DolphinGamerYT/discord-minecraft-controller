@@ -20,13 +20,16 @@ try:
 except:
     print("[Warning] Delay has been set to 0.3, since there's an invalid value on the config.\n")
 
-bot = commands.Bot(command_prefix='s!')
+bot = commands.Bot(command_prefix='!')
 bot.remove_command('help')
 
 keys = {"w": keyboard.VK_W, "a": keyboard.VK_A, "s": keyboard.VK_S, "d": keyboard.VK_D, "space": keyboard.VK_SPACE, "sneak": keyboard.VK_SHIFT, "mleft": keyboard.VK_LEFTCLICK, "mright": keyboard.VK_RIGHTCLICK}
 
 keyspressed = {"w": False, "a": False, "s": False, "d": False, "space": False, "sneak": False, "mleft": False, "mright": False}
 numberCode = {1: keyboard.VK_1, 2: keyboard.VK_2, 3: keyboard.VK_3, 4: keyboard.VK_4, 5: keyboard.VK_5, 6: keyboard.VK_6, 7: keyboard.VK_7, 8: keyboard.VK_8, 9: keyboard.VK_9}
+
+started = False
+game_channel = int(0)
 
 async def walk(key):
     if (keyspressed.get(key)):
@@ -38,14 +41,20 @@ async def walk(key):
 
 @bot.event
 async def on_ready():
+    creator_user = await bot.fetch_user(310011769332695041)
     print("Bot Started Correctly\n")
     print(f"Bot name: {bot.user.name}")
     print(f"Bot id: {bot.user.id}")
 
+    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name='!start |Made by: {}'.format(creator_user)), status='idle')
+
+
 
 @bot.event
 async def on_message(message):
-    if isinstance(message.channel, discord.channel.TextChannel):
+    creator_user = await bot.fetch_user(310011769332695041)
+
+    if message.channel.id == game_channel and started:
         user = message.author
         msg = message.content.lower()
         params = msg.split(" ")
@@ -111,7 +120,40 @@ async def on_message(message):
                 await mouse.rightclick(keyspressed.get(key))
 
             await asyncio.sleep(delay)
+    elif isinstance(message.channel, discord.channel.TextChannel):
+        await bot.process_commands(message)
 
+@bot.command(name="start", aliases=['empezar', 'comenzar', 'go'])
+async def _start(ctx):
+    creator_user = await bot.fetch_user(310011769332695041)
+
+    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name='!stop |Made by: {}'.format(creator_user)), status='online')
+    started = True
+    game_channel = ctx.channel.id()
+
+    embed = discord.Embed(title="Minigame Started!", colour=discord.Colour(0xff1f), description="The game has started. Remember to join the client to a voice channel, and Stream Minecraft. ")
+    embed.set_footer(text=f"Bot made by: {creator_user}", icon_url=f"{creator_user.avatar_url}")
+    embed.add_field(name="Not Working?", value="Try focusing Minecraft window. :sunglasses: ")
+    await ctx.channel.send(embed=embed)
+
+@bot.command(name="stop", aliases=['parar', 'disconnect', 'cancelar', 'cancel'])
+async def _stop(ctx):
+    creator_user = await bot.fetch_user(310011769332695041)
+
+    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name='!start |Made by: {}'.format(creator_user)), status='idle')
+    started = False
+    game_channel = int(0)
+
+    embed = discord.Embed(title="Controller Finished!", colour=discord.Colour(0xff0000), description="Controller has been disconnected. No more Minecraft for today :rage:.")
+    embed.set_footer(text=f"Bot made by: {creator_user}", icon_url=f"{creator_user.avatar_url}")
+    await ctx.channel.send(embed=embed)
+
+
+
+@bot.event
+async def on_command_error(ctx, error):
+    if isinstance(error, CommandNotFound):
+        return
 
 try:
     bot.run(config.get("bot_token"))
