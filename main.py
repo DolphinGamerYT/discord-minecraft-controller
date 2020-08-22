@@ -25,8 +25,9 @@ keys = {"w": keyboard.VK_W, "a": keyboard.VK_A, "s": keyboard.VK_S, "d": keyboar
 keyspressed = {"w": False, "a": False, "s": False, "d": False, "space": False, "sneak": False, "mleft": False, "mright": False}
 numberCode = {1: keyboard.VK_1, 2: keyboard.VK_2, 3: keyboard.VK_3, 4: keyboard.VK_4, 5: keyboard.VK_5, 6: keyboard.VK_6, 7: keyboard.VK_7, 8: keyboard.VK_8, 9: keyboard.VK_9}
 
+global game_channel, started
 started = False
-game_channel = int(0)
+game_channel = 0
 
 async def walk(key):
     if (keyspressed.get(key)):
@@ -50,15 +51,12 @@ async def on_ready():
 @bot.event
 async def on_message(message):
     creator_user = await bot.fetch_user(310011769332695041)
-
     if message.channel.id == game_channel and started:
         user = message.author
         msg = message.content.lower()
         params = msg.split(" ")
 
         for x in range(0, len(params)):
-            used = false
-
             ## Keyboard
 
             # Movement
@@ -78,6 +76,12 @@ async def on_message(message):
 
             elif (params[x] == "drop" or params[x] == "soltar" or params[x] == "q"):
                 keyboard.ClickKey(keyboard.VK_Q)
+            elif (params[x] == "inventory" or params[x] == "inventario" or params[x] == "e" or params[x] == "i"):
+                keyboard.ClickKey(keyboard.VK_E)
+            elif (params[x] == "esc"):
+                keyboard.ClickKey(keyboard.VK_ESC)
+            elif (params[x] == "f"):
+                keyboard.ClickKey(keyboard.VK_F)
 
             # Hotbar
 
@@ -101,14 +105,14 @@ async def on_message(message):
             elif (params[x] == "360"):
                 await mouse.do360()
 
-            elif (params[x] == ("pegar") or params[x] == ("punch") or params[x] == ("mine") or params[x] == ("minar") or params[x] == ("destruir") or params[x] == ("picar") or "izquierdo" in params[x]):
+            elif (params[x] == ("pegar") or params[x] == ("romper") or params[x] == ("break") or params[x] == ("punch") or params[x] == ("mine") or params[x] == ("minar") or params[x] == ("destruir") or params[x] == ("picar") or "izquierdo" in params[x]):
                 key = "mleft"
                 if (keyspressed.get(key)):
                     keyspressed[key] = False
                 else:
                     keyspressed[key] = True
                 await mouse.leftclick(keyspressed.get(key))
-            elif (params[x] == ("colocar") or params[x] == ("block") or params[x] == ("bloquear") or params[x] == ("protect") or params[x] == ("proteger") or "derecho" in params[x]):
+            elif (params[x] == ("colocar") or params[x] == ("place") or params[x] == ("block") or params[x] == ("bloquear") or params[x] == ("protect") or params[x] == ("proteger") or "derecho" in params[x]):
                 key = "mright"
                 if (keyspressed.get(key)):
                     keyspressed[key] = False
@@ -122,11 +126,12 @@ async def on_message(message):
 
 @bot.command(name="start", aliases=['empezar', 'comenzar', 'go'])
 async def _start(ctx):
+    global game_channel, started
     creator_user = await bot.fetch_user(310011769332695041)
 
     await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name='!stop |Made by: {}'.format(creator_user)), status='online')
     started = True
-    game_channel = ctx.channel.id()
+    game_channel = ctx.channel.id
 
     embed = discord.Embed(title="Minigame Started!", colour=discord.Colour(0xff1f), description="The game has started. Remember to join the client to a voice channel, and Stream Minecraft. ")
     embed.set_footer(text=f"Bot made by: {creator_user}", icon_url=f"{creator_user.avatar_url}")
@@ -135,6 +140,7 @@ async def _start(ctx):
 
 @bot.command(name="stop", aliases=['parar', 'disconnect', 'cancelar', 'cancel'])
 async def _stop(ctx):
+    global game_channel, started
     creator_user = await bot.fetch_user(310011769332695041)
 
     await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name='!start |Made by: {}'.format(creator_user)), status='idle')
@@ -151,6 +157,8 @@ async def _stop(ctx):
 async def on_command_error(ctx, error):
     if isinstance(error, CommandNotFound):
         return
+    else:
+        print(error)
 
 try:
     bot.run(config.get("bot_token"))
