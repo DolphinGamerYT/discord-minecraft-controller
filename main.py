@@ -3,11 +3,8 @@ from discord.ext import commands
 from discord import Member
 from discord.ext.commands import has_permissions, MissingPermissions, CommandNotFound
 from discord.utils import get
-import time
 import asyncio
-import datetime
-import keyboard
-import mouse
+from modules import keyboard, mouse
 import yaml
 
 with open('config.yml') as file:
