@@ -31,6 +31,16 @@ VK_F = 0x46
 VK_SHIFT = 0x10
 VK_SPACE = 0x20
 
+VK_1 = 0x31
+VK_2 = 0x32
+VK_3 = 0x33
+VK_4 = 0x34
+VK_5 = 0x35
+VK_6 = 0x36
+VK_7 = 0x37
+VK_8 = 0x38
+VK_9 = 0x39
+
 # C struct definitions
 
 wintypes.ULONG_PTR = wintypes.WPARAM
@@ -90,17 +100,16 @@ def PressKey(hexKeyCode):
     x = INPUT(type=INPUT_KEYBOARD,
               ki=KEYBDINPUT(wVk=hexKeyCode))
     user32.SendInput(1, ctypes.byref(x), ctypes.sizeof(x))
-    print(str(hexKeyCode) + " pressed")
 
 def ReleaseKey(hexKeyCode):
     x = INPUT(type=INPUT_KEYBOARD,
               ki=KEYBDINPUT(wVk=hexKeyCode,
                             dwFlags=KEYEVENTF_KEYUP))
     user32.SendInput(1, ctypes.byref(x), ctypes.sizeof(x))
-    print(str(hexKeyCode) + " released")
 
-def MoveLeft(quantity):
-    win32api.SetCursorPos((x,y))
+def ClickKey(hexKeyCode):
+    PressKey(hexKeyCode)
+    ReleaseKey(hexKeyCode)
 
 
 if __name__ == "__main__":
